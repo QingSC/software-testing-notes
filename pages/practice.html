@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Selenium 综合练习页面</title>
+    <style>
+        /* 一些基础样式，让页面看起来更清晰 */
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, select, textarea { display: block; width: 95%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .hidden-div { display: none; margin-top: 10px; padding: 10px; background: #e9ecef; border-radius: 4px; }
+        #dynamic-content { min-height: 30px; }
+        .error { color: red; }
+        .success { color: green; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .highlight { background-color: yellow; }
+    </style>
+</head>
+<body>
+
+    <h1>🧪 Selenium 技能练习场</h1>
+    <p>用这个页面练习 <strong>元素定位、交互、等待、获取属性</strong> 等核心技能。</p>
+
+    <!-- ==================== 1. 基础输入与按钮 ==================== -->
+    <div class="card">
+        <h2>1. 基础输入框与按钮</h2>
+        <label>用户名</label>
+        <input type="text" id="username" placeholder="请输入用户名">
+
+        <label>密码</label>
+        <input type="password" id="password" placeholder="请输入密码">
+
+        <button id="loginBtn">登录</button>
+        <span id="loginResult" style="margin-left: 20px;"></span>
+    </div>
+
+    <!-- ==================== 2. 下拉框与多选 ==================== -->
+    <div class="card">
+        <h2>2. 下拉框与多选</h2>
+        <label>选择城市</label>
+        <select id="citySelect">
+            <option value="beijing">北京</option>
+            <option value="shanghai" selected>上海</option>
+            <option value="guangzhou">广州</option>
+            <option value="shenzhen">深圳</option>
+        </select>
+
+        <label>兴趣爱好（多选）</label>
+        <select id="hobbySelect" multiple>
+            <option value="coding">编程</option>
+            <option value="reading">阅读</option>
+            <option value="sports">运动</option>
+            <option value="music">音乐</option>
+        </select>
+    </div>
+
+    <!-- ==================== 3. 单选与复选框 ==================== -->
+    <div class="card">
+        <h2>3. 单选按钮 &amp; 复选框</h2>
+        <label>性别：</label>
+        <input type="radio" name="gender" value="male" id="male"> 男
+        <input type="radio" name="gender" value="female" id="female"> 女
+
+        <br><br>
+        <label>通知方式：</label>
+        <input type="checkbox" id="emailNotify" checked> 邮件
+        <input type="checkbox" id="smsNotify"> 短信
+        <input type="checkbox" id="wechatNotify"> 微信
+    </div>
+
+    <!-- ==================== 4. 文本域与动态内容 ==================== -->
+    <div class="card">
+        <h2>4. 文本域 &amp; 动态内容</h2>
+        <label>评论</label>
+        <textarea id="comment" rows="3">这是一条默认评论。</textarea>
+        <button id="updateBtn">更新内容</button>
+        <button id="showHiddenBtn">显示隐藏区域</button>
+
+        <div id="dynamic-content">等待更新...</div>
+        <div id="hiddenDiv" class="hidden-div">这是一个隐藏的 DIV，用于练习显示/隐藏元素的操作。</div>
+    </div>
+
+    <!-- ==================== 5. 表格数据 ==================== -->
+    <div class="card">
+        <h2>5. 表格数据（练习遍历与获取文本）</h2>
+        <table id="dataTable">
+            <tr><th>姓名</th><th>年龄</th><th>城市</th></tr>
+            <tr><td>张三</td><td>25</td><td>北京</td></tr>
+            <tr><td>李四</td><td>30</td><td>上海</td></tr>
+            <tr><td>王五</td><td>28</td><td>广州</td></tr>
+        </table>
+    </div>
+
+    <!-- ==================== 6. 等待练习（延迟加载） ==================== -->
+    <div class="card">
+        <h2>6. 显式等待练习</h2>
+        <button id="loadBtn">点击加载数据</button>
+        <div id="delayedContent" style="margin-top:10px; min-height:30px;">内容会在3秒后加载...</div>
+    </div>
+
+    <!-- ==================== 7. 交互反馈与断言 ==================== -->
+    <div class="card">
+        <h2>7. 交互反馈（练习获取文本与断言）</h2>
+        <button id="showMessageBtn">显示欢迎消息</button>
+        <div id="messageDisplay" class="success"></div>
+    </div>
+
+    <!-- ==================== 8. 模态框（弹窗） ==================== -->
+    <div class="card">
+        <h2>8. 模态框（练习 alert / confirm）</h2>
+        <button id="alertBtn">弹出 Alert</button>
+        <button id="confirmBtn">弹出 Confirm</button>
+        <span id="confirmResult"></span>
+    </div>
+
+    <script>
+        // -------------------- 脚本功能 --------------------
+
+        // 1. 登录按钮
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            let user = document.getElementById('username').value.trim();
+            let pwd = document.getElementById('password').value.trim();
+            let result = document.getElementById('loginResult');
+
+            // 1. 检查用户名
+            if (user === '') {
+                result.innerHTML = '❌ 请输入用户名';
+                result.style.color = 'red';
+                return;
+            }
+
+            // 2. 检查密码
+            if (pwd === '') {
+                result.innerHTML = '❌ 请输入密码';
+                result.style.color = 'red';
+                return;
+            }
+
+            // 3. 验证账号密码（预设正确的账号：admin / 123456）
+            if (user === 'admin' && pwd === '123456') {
+                result.innerHTML = '✅ 登录成功！欢迎 ' + user;
+                result.style.color = 'green';
+            } else {
+                result.innerHTML = '❌ 用户名或密码错误';
+                result.style.color = 'red';
+            }
+        });
+
+        // 2. 更新内容
+        document.getElementById('updateBtn').addEventListener('click', function() {
+            let comment = document.getElementById('comment').value;
+            document.getElementById('dynamic-content').textContent = '📝 最新评论：' + comment;
+        });
+
+        // 3. 显示/隐藏
+        document.getElementById('showHiddenBtn').addEventListener('click', function() {
+            let div = document.getElementById('hiddenDiv');
+            if (div.style.display === 'none' || div.style.display === '') {
+                div.style.display = 'block';
+            } else {
+                div.style.display = 'none';
+            }
+        });
+
+        // 4. 延迟加载（模拟网络请求）
+        document.getElementById('loadBtn').addEventListener('click', function() {
+            let content = document.getElementById('delayedContent');
+            content.textContent = '⏳ 加载中...';
+            setTimeout(() => {
+                content.innerHTML = '✅ 数据加载完成！当前时间：' + new Date().toLocaleTimeString();
+            }, 3000);
+        });
+
+        // 5. 显示消息
+        document.getElementById('showMessageBtn').addEventListener('click', function() {
+            let msgDiv = document.getElementById('messageDisplay');
+            msgDiv.textContent = '🎉 欢迎来到 Selenium 练习场！';
+            msgDiv.className = 'success';
+        });
+
+        // 6. Alert 和 Confirm
+        document.getElementById('alertBtn').addEventListener('click', function() {
+            alert('这是一个 Alert 弹窗！');
+        });
+
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            let result = confirm('你确认要执行此操作吗？');
+            document.getElementById('confirmResult').textContent = result ? '✅ 你点击了“确定”' : '❌ 你点击了“取消”';
+        });
+
+        // 7. 下拉框默认选中（上海）
+        document.getElementById('citySelect').value = 'shanghai';
+    </script>
+
+</body>
+</html>
