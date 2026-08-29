@@ -1,20 +1,9 @@
-import os
 from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
 
 
-class LoginPage:
+class LoginPage(BasePage):
     """登录页面封装类"""
-
-    def __init__(self, driver):
-        """初始化时传入浏览器驱动"""
-        self.driver = driver
-
-    def open(self):
-        """打开本地登录练习页面"""
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(base_dir, "../pages/practice.html")
-        file_path = os.path.abspath(file_path)
-        self.driver.get(f"file:///{file_path}")
 
     def input_username(self, username):
         """输入用户名"""

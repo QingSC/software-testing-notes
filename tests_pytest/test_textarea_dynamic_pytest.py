@@ -1,42 +1,47 @@
-from selenium.webdriver.common.by import By
 import pytest
+from pages.textarea_page import TextareaPage
+
+
 pytestmark = pytest.mark.textarea
 
-def test_textarea_input(practice_page):
-    """测试文本域输入内容"""
-    textarea = practice_page.find_element(By.ID, "comment")
-    textarea.clear()
-    textarea.send_keys("自动化测试练习")
 
-    value = textarea.get_attribute("value")
+def test_textarea_input(driver):
+    """测试文本域输入内容"""
+    page = TextareaPage(driver)
+    page.open()
+
+    page.input_comment("自动化测试练习")
+    value = page.get_comment_value()
+
     assert value == "自动化测试练习", f"文本域内容不符：{value}"
 
-def test_update_dynamic_content(practice_page):
+
+def test_update_dynamic_content(driver):
     """测试点击更新按钮后动态内容显示"""
+    page = TextareaPage(driver)
+    page.open()
 
-    # 先在文本域输入内容
-    textarea = practice_page.find_element(By.ID, "comment")
-    textarea.clear()
-    textarea.send_keys("自动化测试练习")
+    page.input_comment("自动化测试练习")
+    page.click_update_button()
 
-    # 点击更新按钮
-    practice_page.find_element(By.ID, "updateBtn").click()
+    text = page.get_dynamic_content_text()
+    assert "自动化测试练习" in text, f"动态内容不符：{text}"
 
-    # 检查动态内容区
-    dynamic = practice_page.find_element(By.ID, "dynamic-content")
-    assert "自动化测试练习" in dynamic.text, f"动态内容不符：{dynamic.text}"
 
-def test_show_hidden_content(practice_page):
+def test_show_hidden_content(driver):
     """测试显示隐藏区域"""
-    practice_page.find_element(By.ID, "showHiddenBtn").click()
+    page = TextareaPage(driver)
+    page.open()
 
-    hidden = practice_page.find_element(By.ID, "hiddenDiv")
-    assert hidden.is_displayed(), "隐藏区域未显示"
+    page.click_show_hidden_button()
+    assert page.is_hidden_content_displayed(), "隐藏区域未显示"
 
-def test_hide_content_again(practice_page):
+
+def test_hide_content_again(driver):
     """测试再次点击后隐藏区域重新隐藏"""
-    practice_page.find_element(By.ID, "showHiddenBtn").click()
-    hidden = practice_page.find_element(By.ID, "hiddenDiv")
+    page = TextareaPage(driver)
+    page.open()
 
-    practice_page.find_element(By.ID, "showHiddenBtn").click()
-    assert not hidden.is_displayed(), "隐藏区域仍然显示"
+    page.click_show_hidden_button()
+    page.click_show_hidden_button()
+    assert not page.is_hidden_content_displayed(), "隐藏区域仍然显示"

@@ -1,29 +1,27 @@
-from selenium.webdriver.common.by import By
 import pytest
+from pages.message_page import MessagePage
+
+
 pytestmark = pytest.mark.message
 
-def test_show_welcome_message(practice_page):
+
+def test_show_welcome_message(driver):
     """测试点击按钮后显示欢迎消息，并验证 class 属性"""
-    # 点击"显示欢迎消息"按钮
-    show_btn = practice_page.find_element(By.ID, "showMessageBtn")
-    show_btn.click()
+    page = MessagePage(driver)
+    page.open()
 
-    # 获取显示的消息文本
-    message = practice_page.find_element(By.ID, "messageDisplay")
-    assert message.text == "🎉 欢迎来到 Selenium 练习场！", f"消息文本不符：{message.text}"
+    page.click_show_message_button()
 
-    # 获取 class 属性并断言
-    class_value = message.get_attribute("class")
-    assert class_value == "success", f"class 属性不符：{class_value}"
+    assert page.get_message_text() == "🎉 欢迎来到 Selenium 练习场！", f"消息文本不符"
+    assert page.get_message_class() == "success", f"class 属性不符"
 
 
-def test_message_persists_on_second_click(practice_page):
+def test_message_persists_on_second_click(driver):
     """测试再次点击按钮后消息仍然显示"""
-    show_btn = practice_page.find_element(By.ID, "showMessageBtn")
+    page = MessagePage(driver)
+    page.open()
 
-    # 点击两次
-    show_btn.click()
-    show_btn.click()
+    page.click_show_message_button()
+    page.click_show_message_button()
 
-    message = practice_page.find_element(By.ID, "messageDisplay")
-    assert message.text == "🎉 欢迎来到 Selenium 练习场！", f"第二次点击后消息文本不符：{message.text}"
+    assert page.get_message_text() == "🎉 欢迎来到 Selenium 练习场！", f"第二次点击后消息文本不符"
