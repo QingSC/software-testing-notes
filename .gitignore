@@ -47,3 +47,12 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
+
+# Screenshots and reports
+screenshots/
+reports/
+report.html
+
+# pytest cache
+.pytest_cache/
