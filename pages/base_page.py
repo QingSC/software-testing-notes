@@ -13,4 +13,5 @@ class BasePage:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(base_dir, "../pages/practice.html")
         file_path = os.path.abspath(file_path)
+        self.driver.logger.info(f"打开页面：{file_path}")
         self.driver.get(f"file:///{file_path}")
