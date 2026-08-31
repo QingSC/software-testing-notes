@@ -1,3 +1,4 @@
+import codecs
 import os
 import pytest
 from selenium import webdriver
@@ -42,10 +43,17 @@ def pytest_runtest_makereport(item, call):
             screenshots_dir = os.path.join(project_root, "screenshots")
             os.makedirs(screenshots_dir, exist_ok=True)
 
-            # 生成截图文件名：用例名里的非安全字符替换为下划线
-            # 参数化用例名可能包含中文、方括号、空格等，需要处理成合法文件名
-            test_name = item.name
-            safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in test_name)
+            # 生成截图文件名
+            # pytest 在 Windows 下可能把中文参数显示为 \uXXXX 转义形式
+            # 先尝试还原成真实中文，再处理非法字符
+            try:
+                decoded_name = codecs.decode(item.name, "unicode_escape")
+            except Exception:
+                decoded_name = item.name
+
+            safe_name = "".join(
+                c if c.isalnum() or c in "-_" else "_" for c in decoded_name
+            )
             file_path = os.path.join(screenshots_dir, f"{safe_name}.png")
 
             # 截图并保存
