@@ -8,7 +8,9 @@ class TablePage(BasePage):
     def get_table_rows(self):
         """获取表格所有行"""
         table = self.driver.find_element(By.ID, "dataTable")
-        return table.find_elements(By.TAG_NAME, "tr")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.driver.logger.info(f"获取表格行数：{len(rows)}")
+        return rows
 
     def get_row_cells(self, row):
         """获取某一行的所有单元格"""
@@ -16,11 +18,15 @@ class TablePage(BasePage):
 
     def find_city_by_name(self, name):
         """根据姓名查找所在城市，找不到返回 None"""
+        self.driver.logger.info(f"根据姓名查找城市：{name}")
         rows = self.get_table_rows()
         for row in rows[1:]:  # 跳过表头
             cells = self.get_row_cells(row)
             if len(cells) > 0 and cells[0].text == name:
-                return cells[2].text
+                city = cells[2].text
+                self.driver.logger.info(f"{name} 所在城市：{city}")
+                return city
+        self.driver.logger.info(f"未找到姓名：{name}")
         return None
 
     def get_name_column_values(self):
@@ -31,4 +37,5 @@ class TablePage(BasePage):
             cells = self.get_row_cells(row)
             if len(cells) > 0:
                 names.append(cells[0].text)
+        self.driver.logger.info(f"姓名列数据：{names}")
         return names
