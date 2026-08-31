@@ -1,17 +1,54 @@
 import codecs
+import logging
 import os
 import pytest
 from selenium import webdriver
 
 
 @pytest.fixture
-def driver():
+def driver(request):
     """
-    创建一个 Edge 浏览器驱动，并在测试结束后自动关闭。
-    这个 fixture 会被 tests_pytest 文件夹下的所有测试文件自动使用。
+    创建 Edge 浏览器驱动，并在测试结束后自动关闭。
+    同时初始化当前测试用例的日志记录。
     """
-    # 测试开始前执行：打开浏览器
+    # 创建日志目录
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    logs_dir = os.path.join(project_root,"logs")
+    os.makedirs(logs_dir,exist_ok=True)
+
+    # 生成日志文件名
+    test_name = request.node.name
+    try:
+        decoded_name = codecs.decode(test_name,"unicode_escape")
+    except Exception:
+        decoded_name = test_name
+    safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in decoded_name)
+    log_file = os.path.join(logs_dir,f"{safe_name}.log")
+
+    #配置日志
+    logger = logging.getLogger(test_name)
+    logger.setLevel(logging.INFO)
+
+    # 清空旧的 handler，避免重复
+    logger.handlers = []
+
+    # 文件 handler
+    file_handler = logging.FileHandler(log_file, encoding="utf-8",mode="w")
+    file_handler.setLevel(logging.INFO)
+
+    # 日志格式
+    formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s"
+    )
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+
+
+
+    # 创建浏览器
     driver = webdriver.Edge()
+    driver.logger = logger # 把 logger 挂在 driver 上，方便测试函数使用
 
     # 把 driver 交给测试函数使用
     yield driver
@@ -65,3 +102,4 @@ def pytest_runtest_makereport(item, call):
                 print(f"\n[screenshot] 失败截图已保存：{file_path}")
             except Exception as e:
                 print(f"\n[screenshot] 截图失败：{e}")
+

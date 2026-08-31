@@ -14,9 +14,14 @@ pytestmark = [pytest.mark.login, pytest.mark.smoke]
 ])
 def test_login(driver, username, password, expected):
     """参数化登录测试：使用 Page Object 封装"""
+    driver.logger.info(f"测试数据：用户名={username}, 密码={password}")
     page = LoginPage(driver)
     page.open()
+    driver.logger.info("已打开登录页面")
+
     page.login(username, password)
+    driver.logger.info("已执行登录操作")
 
     result = page.get_result()
+    driver.logger.info(f"登录结果：{result}")
     assert expected in result, f"期望包含'{expected}'，实际显示：{result}"
