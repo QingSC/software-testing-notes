@@ -1,0 +1,23 @@
+login_cases:
+  - username: admin
+    password: "123456"
+    expected: 登录成功
+
+  - username: ""
+    password: "123456"
+    expected: 请输入用户名
+
+  - username: admin
+    password: ""
+    expected: 请输入密码
+
+  - username: wronguser
+    password: "123456"
+    expected: 用户名或密码错误
+
+  - username: admin
+    password: wrongpwd
+    expected: 用户名或密码错误
+  
+
+  

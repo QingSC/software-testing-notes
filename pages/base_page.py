@@ -9,9 +9,8 @@ class BasePage:
         self.driver = driver
 
     def open(self):
-        """打开本地练习页面 practice.html"""
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(base_dir, "../pages/practice.html")
-        file_path = os.path.abspath(file_path)
+        """打开配置文件中指定的练习页面"""
+        # 从 driver 上挂载的配置中读取页面地址
+        file_path = self.driver.config.get("base_url")
         self.driver.logger.info(f"打开页面：{file_path}")
         self.driver.get(f"file:///{file_path}")

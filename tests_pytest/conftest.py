@@ -1,4 +1,5 @@
 import codecs
+import json
 import logging
 import os
 import pytest
@@ -6,27 +7,58 @@ import allure
 from selenium import webdriver
 
 
+def pytest_addoption(parser):
+    """添加自定义命令行参数"""
+    parser.addoption(
+        "--env",
+        action="store",
+        default="dev",
+        help="测试环境：dev/test"
+    )
+
+
+def load_config(env="dev"):
+    """读取指定环境的配置文件，并返回配置字典"""
+    # 当前文件在 tests_pytest/ 目录，项目根目录在上一层
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    config_dir = os.path.join(project_root, "..", "config")
+    config_file = os.path.join(config_dir, f"{env}.json")
+
+    with open(config_file, "r", encoding="utf-8") as f:
+        config = json.load(f)
+
+    # 把 base_url 解析成绝对路径，方便后面直接使用
+    base_url = config.get("base_url", "../pages/practice.html")
+    config["base_url"] = os.path.abspath(os.path.join(config_dir, base_url))
+
+    return config
+
+
 @pytest.fixture
 def driver(request):
     """
-    创建 Edge 浏览器驱动，并在测试结束后自动关闭。
+    创建浏览器驱动，并在测试结束后自动关闭。
     同时初始化当前测试用例的日志记录。
     """
+    # 读取环境配置
+    env = request.config.getoption("--env")
+    config = load_config(env)
+
     # 创建日志目录
     project_root = os.path.dirname(os.path.abspath(__file__))
-    logs_dir = os.path.join(project_root,"logs")
-    os.makedirs(logs_dir,exist_ok=True)
+    logs_dir = os.path.join(project_root, "logs")
+    os.makedirs(logs_dir, exist_ok=True)
 
     # 生成日志文件名
     test_name = request.node.name
     try:
-        decoded_name = codecs.decode(test_name,"unicode_escape")
+        decoded_name = codecs.decode(test_name, "unicode_escape")
     except Exception:
         decoded_name = test_name
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in decoded_name)
-    log_file = os.path.join(logs_dir,f"{safe_name}.log")
+    log_file = os.path.join(logs_dir, f"{safe_name}.log")
 
-    #配置日志
+    # 配置日志
     logger = logging.getLogger(test_name)
     logger.setLevel(logging.INFO)
 
@@ -34,7 +66,7 @@ def driver(request):
     logger.handlers = []
 
     # 文件 handler
-    file_handler = logging.FileHandler(log_file, encoding="utf-8",mode="w")
+    file_handler = logging.FileHandler(log_file, encoding="utf-8", mode="w")
     file_handler.setLevel(logging.INFO)
 
     # 日志格式
@@ -42,15 +74,22 @@ def driver(request):
         "%(asctime)s - %(levelname)s - %(message)s"
     )
     file_handler.setFormatter(formatter)
-
     logger.addHandler(file_handler)
 
+    # 根据配置创建浏览器
+    browser = config.get("browser", "edge").lower()
+    if browser == "edge":
+        driver = webdriver.Edge()
+    elif browser == "chrome":
+        driver = webdriver.Chrome()
+    elif browser == "firefox":
+        driver = webdriver.Firefox()
+    else:
+        raise ValueError(f"不支持的浏览器类型：{browser}")
 
-
-    # 创建浏览器
-    driver = webdriver.Edge()
-    driver.logger = logger # 把 logger 挂在 driver 上，方便测试函数使用
-    driver.log_file = log_file # 把日志文件路径也挂上去，失败时方便读取
+    driver.logger = logger  # 把 logger 挂在 driver 上，方便测试函数使用
+    driver.log_file = log_file  # 把日志文件路径也挂上去，失败时方便读取
+    driver.config = config  # 把配置也挂在 driver 上，方便 Page Object 使用
 
     # 把 driver 交给测试函数使用
     yield driver
@@ -125,4 +164,3 @@ def pytest_runtest_makereport(item, call):
                     )
                 except Exception as e:
                     print(f"\n[allure] 附加日志失败：{e}")
-
