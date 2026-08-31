@@ -2,6 +2,7 @@ import codecs
 import logging
 import os
 import pytest
+import allure
 from selenium import webdriver
 
 
@@ -49,6 +50,7 @@ def driver(request):
     # 创建浏览器
     driver = webdriver.Edge()
     driver.logger = logger # 把 logger 挂在 driver 上，方便测试函数使用
+    driver.log_file = log_file # 把日志文件路径也挂上去，失败时方便读取
 
     # 把 driver 交给测试函数使用
     yield driver
@@ -100,6 +102,27 @@ def pytest_runtest_makereport(item, call):
                 with open(file_path, "wb") as f:
                     f.write(screenshot_bytes)
                 print(f"\n[screenshot] 失败截图已保存：{file_path}")
+
+                # 把截图附加到 Allure 报告
+                allure.attach(
+                    screenshot_bytes,
+                    name="失败截图",
+                    attachment_type=allure.attachment_type.PNG
+                )
             except Exception as e:
                 print(f"\n[screenshot] 截图失败：{e}")
+
+            # 把测试日志附加到 Allure 报告
+            log_file = getattr(driver, "log_file", None)
+            if log_file and os.path.exists(log_file):
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        log_content = f.read()
+                    allure.attach(
+                        log_content,
+                        name="测试日志",
+                        attachment_type=allure.attachment_type.TEXT
+                    )
+                except Exception as e:
+                    print(f"\n[allure] 附加日志失败：{e}")
 
