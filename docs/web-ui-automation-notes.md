@@ -12,6 +12,7 @@
 | 阶段二 | 失败诊断能力 | [web-ui-phase2-diagnosis.md](web-ui-phase2-diagnosis.md) |
 | 阶段三 | Allure 测试报告 | [web-ui-phase3-allure.md](web-ui-phase3-allure.md) |
 | 阶段四 | 测试数据与配置分离 | [web-ui-phase4-data-config.md](web-ui-phase4-data-config.md) |
+| 阶段五 | 高级 Selenium 操作 | [web-ui-phase5-advanced-selenium.md](web-ui-phase5-advanced-selenium.md) |
 
 ---
 

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>iframe 内嵌页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { padding: 8px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h3>iframe 内的表单</h3>
+    <label>iframe 用户名：</label>
+    <input type="text" id="iframeUsername" placeholder="请输入用户名">
+    <br>
+    <button id="iframeSubmitBtn">提交</button>
+    <p id="iframeMessage"></p>
+
+    <script>
+        document.getElementById('iframeSubmitBtn').addEventListener('click', function() {
+            let username = document.getElementById('iframeUsername').value;
+            if (username.trim() === '') {
+                document.getElementById('iframeMessage').textContent = '❌ 用户名不能为空';
+                document.getElementById('iframeMessage').style.color = 'red';
+            } else {
+                document.getElementById('iframeMessage').textContent = '✅ 欢迎，' + username;
+                document.getElementById('iframeMessage').style.color = 'green';
+            }
+        });
+    </script>
+</body>
+</html>

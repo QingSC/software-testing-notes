@@ -1,4 +1,5 @@
 {
     "browser": "edge",
-    "base_url": "../pages/practice.html" 
+    "base_url": "../pages/practice.html",
+    "advanced_url": "../pages/advanced-practice.html"
 }

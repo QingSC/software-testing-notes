@@ -27,9 +27,10 @@ def load_config(env="dev"):
     with open(config_file, "r", encoding="utf-8") as f:
         config = json.load(f)
 
-    # 把 base_url 解析成绝对路径，方便后面直接使用
-    base_url = config.get("base_url", "../pages/practice.html")
-    config["base_url"] = os.path.abspath(os.path.join(config_dir, base_url))
+    # 把配置文件中的相对路径字段转成绝对路径
+    for key in ["base_url", "advanced_url"]:
+        if key in config:
+            config[key] = os.path.abspath(os.path.join(config_dir, config[key]))
 
     return config
 

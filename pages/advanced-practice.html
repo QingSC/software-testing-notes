@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Selenium 高级练习页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .menu { position: relative; display: inline-block; }
+        .menu-title { background: #007bff; color: white; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
+        .menu-items { display: none; position: absolute; background: white; min-width: 120px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); border-radius: 4px; z-index: 1; }
+        .menu-item { padding: 10px; cursor: pointer; }
+        .menu-item:hover { background: #f0f0f0; }
+        .menu:hover .menu-items { display: block; }
+        #dragSource, #dragTarget { width: 100px; height: 100px; display: inline-block; margin: 10px; line-height: 100px; text-align: center; border-radius: 8px; }
+        #dragSource { background: #007bff; color: white; cursor: move; }
+        #dragTarget { background: #28a745; color: white; border: 2px dashed #1e7e34; }
+        #doubleClickArea { width: 200px; height: 80px; background: #ffc107; line-height: 80px; text-align: center; border-radius: 8px; cursor: pointer; }
+        #contextMenuArea { width: 200px; height: 80px; background: #17a2b8; color: white; line-height: 80px; text-align: center; border-radius: 8px; }
+        #readonlyInput { margin: 10px 0; padding: 8px; }
+        #scrollContainer { height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+        #scrollContainer .item { padding: 20px; border-bottom: 1px solid #eee; }
+        #loadMoreBtn { margin-top: 10px; }
+        .hidden-box { display: none; width: 150px; height: 50px; background: #fd7e14; color: white; line-height: 50px; text-align: center; border-radius: 4px; margin-top: 10px; }
+        .red-box { width: 150px; height: 50px; background: #dc3545; color: white; line-height: 50px; text-align: center; border-radius: 4px; margin-top: 10px; }
+        #dynamicText { margin-top: 10px; padding: 10px; background: #e9ecef; border-radius: 4px; min-height: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Selenium 高级技能练习场</h1>
+    <p>练习 ActionChains、iframe、窗口切换、JavaScript、高级等待等高级操作。</p>
+
+    <!-- 1. ActionChains：悬停菜单 -->
+    <div class="card">
+        <h2>1. 鼠标悬停菜单</h2>
+        <div class="menu" id="hoverMenu">
+            <div class="menu-title">hover 菜单</div>
+            <div class="menu-items">
+                <div class="menu-item" id="menuItem1">选项一</div>
+                <div class="menu-item" id="menuItem2">选项二</div>
+                <div class="menu-item" id="menuItem3">选项三</div>
+            </div>
+        </div>
+        <p id="menuResult">等待选择...</p>
+    </div>
+
+    <!-- 2. ActionChains：拖拽 -->
+    <div class="card">
+        <h2>2. 拖拽元素</h2>
+        <div id="dragSource" draggable="true">拖拽我</div>
+        <div id="dragTarget">放这里</div>
+        <p id="dragResult">等待拖拽...</p>
+    </div>
+
+    <!-- 3. ActionChains：双击与右键 -->
+    <div class="card">
+        <h2>3. 双击与右键</h2>
+        <div id="doubleClickArea">双击我</div>
+        <p id="doubleClickResult">等待双击...</p>
+        <br>
+        <div id="contextMenuArea">右键我</div>
+        <p id="contextMenuResult">等待右键...</p>
+    </div>
+
+    <!-- 4. iframe -->
+    <div class="card">
+        <h2>4. iframe 内嵌页面</h2>
+        <iframe id="innerFrame" src="iframe-form.html" width="100%" height="200" style="border:1px solid #ccc;"></iframe>
+    </div>
+
+    <!-- 5. 新窗口 -->
+    <div class="card">
+        <h2>5. 新窗口/新标签页</h2>
+        <a id="newWindowLink" href="new-window.html" target="_blank">打开新窗口</a>
+    </div>
+
+    <!-- 6. JavaScript：只读属性与滚动 -->
+    <div class="card">
+        <h2>6. JavaScript 练习</h2>
+        <label>只读日期输入框：</label>
+        <input type="text" id="readonlyInput" value="2024-01-01" readonly>
+        <p id="jsResult">只读输入框当前值：<span id="readonlyValue">2024-01-01</span></p>
+
+        <div id="scrollContainer">
+            <div class="item">项目 1</div>
+            <div class="item">项目 2</div>
+            <div class="item">项目 3</div>
+            <div class="item">项目 4</div>
+            <div class="item">项目 5</div>
+        </div>
+        <button id="loadMoreBtn">加载更多</button>
+    </div>
+
+    <!-- 7. 高级等待：元素出现/消失/可点击/可见/文本变化 -->
+    <div class="card">
+        <h2>7. 高级等待练习</h2>
+
+        <h4>等待元素可点击</h4>
+        <button id="appearBtn">3 秒后显示按钮</button>
+        <button id="clickableBtn" style="display:none;">我现在可点击了</button>
+
+        <h4>等待元素可见</h4>
+        <button id="showVisibleBtn">3 秒后显示橙色方块</button>
+        <div id="visibleBox" class="hidden-box">我现在可见了</div>
+
+        <h4>等待元素出现在 DOM 中</h4>
+        <button id="addElementBtn">3 秒后添加新元素</button>
+        <div id="dynamicContainer"></div>
+
+        <h4>等待文本出现</h4>
+        <button id="changeTextBtn">3 秒后改变下方文本</button>
+        <div id="dynamicText">等待文本变化...</div>
+
+        <h4>等待元素消失</h4>
+        <button id="disappearTriggerBtn">3 秒后红色方块消失</button>
+        <div id="disappearBox" class="red-box">我会消失</div>
+    </div>
+
+    <script>
+        // 1. 悬停菜单
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.getElementById('menuResult').textContent = '你选择了：' + this.textContent;
+            });
+        });
+
+        // 2. 拖拽
+        let dragged = false;
+        document.getElementById('dragSource').addEventListener('dragstart', function() {
+            dragged = true;
+        });
+        document.getElementById('dragTarget').addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        document.getElementById('dragTarget').addEventListener('drop', function() {
+            if (dragged) {
+                document.getElementById('dragResult').textContent = '✅ 拖拽成功！';
+                document.getElementById('dragTarget').style.background = '#007bff';
+            }
+        });
+
+        // 3. 双击与右键
+        document.getElementById('doubleClickArea').addEventListener('dblclick', function() {
+            document.getElementById('doubleClickResult').textContent = '✅ 双击成功！';
+        });
+        document.getElementById('contextMenuArea').addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            document.getElementById('contextMenuResult').textContent = '✅ 右键成功！';
+        });
+
+        // 6. 只读输入框值同步
+        document.getElementById('readonlyInput').addEventListener('input', function() {
+            document.getElementById('readonlyValue').textContent = this.value;
+        });
+
+        // 7. 加载更多
+        let itemCount = 5;
+        document.getElementById('loadMoreBtn').addEventListener('click', function() {
+            let container = document.getElementById('scrollContainer');
+            for (let i = 0; i < 3; i++) {
+                itemCount++;
+                let div = document.createElement('div');
+                div.className = 'item';
+                div.textContent = '项目 ' + itemCount;
+                container.appendChild(div);
+            }
+        });
+
+        // 7. 高级等待
+        document.getElementById('appearBtn').addEventListener('click', function() {
+            setTimeout(() => {
+                let btn = document.getElementById('clickableBtn');
+                btn.style.display = 'inline-block';
+            }, 3000);
+        });
+
+        document.getElementById('clickableBtn').addEventListener('click', function() {
+            this.textContent = '✅ 已点击';
+        });
+
+        document.getElementById('showVisibleBtn').addEventListener('click', function() {
+            setTimeout(() => {
+                document.getElementById('visibleBox').style.display = 'block';
+            }, 3000);
+        });
+
+        document.getElementById('addElementBtn').addEventListener('click', function() {
+            setTimeout(() => {
+                let container = document.getElementById('dynamicContainer');
+                let div = document.createElement('div');
+                div.id = 'newDynamicElement';
+                div.textContent = '我是延迟添加的元素';
+                div.style.padding = '10px';
+                div.style.background = '#28a745';
+                div.style.color = 'white';
+                div.style.borderRadius = '4px';
+                div.style.marginTop = '10px';
+                container.appendChild(div);
+            }, 3000);
+        });
+
+        document.getElementById('changeTextBtn').addEventListener('click', function() {
+            setTimeout(() => {
+                document.getElementById('dynamicText').textContent = '✅ 文本已改变';
+            }, 3000);
+        });
+
+        document.getElementById('disappearTriggerBtn').addEventListener('click', function() {
+            setTimeout(() => {
+                document.getElementById('disappearBox').style.display = 'none';
+            }, 3000);
+        });
+    </script>
+
+</body>
+</html>

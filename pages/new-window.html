@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>新窗口页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #e9ecef; }
+        .container { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: 50px auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🪟 这是新打开的窗口</h2>
+        <p id="newWindowText">新窗口加载成功</p>
+        <button id="closeHintBtn">点击后文字改变</button>
+    </div>
+
+    <script>
+        document.getElementById('closeHintBtn').addEventListener('click', function() {
+            document.getElementById('newWindowText').textContent = '✅ 新窗口中的按钮已点击';
+        });
+    </script>
+</body>
+</html>
